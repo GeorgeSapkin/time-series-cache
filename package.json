@@ -1,0 +1,32 @@
+{
+  "name": "timeseries-cache",
+  "version": "0.1.0",
+  "main": "src/cache.js",
+  "author": {
+    "name": "George Sapkin",
+    "email": "george@sapk.in"
+  },
+  "scripts": {
+    "test": "jest --coverage --silent=false",
+    "test-travis": "npm test && cat ./coverage/lcov.info | coveralls"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "jest": "^24.0.0"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/*.js"
+    ],
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  }
+}
