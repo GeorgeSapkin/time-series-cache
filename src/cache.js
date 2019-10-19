@@ -103,8 +103,9 @@ class TimeseriesCache {
     this._keys         = keys;
     this._loadPage     = loadPage;
 
-    this._pages     = new Map();
-    this._pageLoads = 0;
+    this._pagesById  = new Map();
+    this._pagesByKey = new Map();
+    this._pageLoads  = 0;
   }
 
   get pageLoads() {
@@ -112,7 +113,18 @@ class TimeseriesCache {
   }
 
   get size() {
-    return this._pages.size;
+    return this._pagesByKey.size;
+  }
+
+  evictStalePages(since) {
+    for (const [key, page] of this._pagesByKey) {
+      if (since > page.updated)
+        this._pagesByKey.delete(key);
+    }
+    for (const [key, page] of this._pagesById) {
+      if (since > page.updated)
+        this._pagesById.delete(key);
+    }
   }
 
   /**
@@ -133,26 +145,16 @@ class TimeseriesCache {
       this._getValue(from, to, slice[1], to);
   }
 
-  evictStalePages(since) {
-    for (const [key, page] of this._pages) {
-      if (since > page.updated)
-        this._pages.delete(key);
-    }
-  }
-
   async isUpToDate(value) {
     const {
-      [this._keys.timestamp]: timestamp,
       [this._keys.pageInfo]:  { id, version } = {}
     } = value;
 
-    const range = this._getPageRange(timestamp);
-    if (!this._hasPage(range))
+    if (!this._pagesById.has(id))
       return false;
 
-    const page = await this._getPage(range);
-
-    return id === page.id && version === page.version;
+    const page = await this._pagesById.get(id);
+    return version === page.version;
   }
 
   async upsert(value) {
@@ -166,9 +168,9 @@ class TimeseriesCache {
 
   async _getPage(range) {
     const key = rangeToKey(range);
-    if (this._pages.has(key))
+    if (this._pagesByKey.has(key))
       // Returns either a page stub that will be resolved later or a page.
-      return this._pages.get(key);
+      return this._pagesByKey.get(key);
 
     // Ensure page is only loaded once by creating a page stub that will be
     // resolved when page is loaded and will replace itself with the loaded
@@ -176,15 +178,19 @@ class TimeseriesCache {
     const pageStub = Promise.resolve()
       .then(() => this._loadPage(range))
       .then(values => {
+        const id = this._pageLoads++;
         const page = new Page({
-          id:   this._pageLoads++,
           keys: this._keys,
+          id,
           values
         });
-        this._pages.set(key, page);
+
+        this._pagesById.set(id, page);
+        this._pagesByKey.set(key, page);
+
         return page;
       });
-    this._pages.set(key, pageStub);
+    this._pagesByKey.set(key, pageStub);
 
     return pageStub;
   }
@@ -194,11 +200,6 @@ class TimeseriesCache {
     const page  = await this._getPage(range);
 
     return getValue(this._keys, from, to, slice, page);
-  }
-
-  _hasPage(range) {
-    const key = rangeToKey(range);
-    return this._pages.has(key);
   }
 };
 
