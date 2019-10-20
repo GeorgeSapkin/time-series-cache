@@ -8,8 +8,12 @@ const { Slice, TimeseriesCache } = require('./cache');
 
 const THIRTY_SEC = 1000 * 30;
 
-function getCache(keys = undefined) {
+function getCache({
+  bias = undefined,
+  keys = undefined
+} = {}) {
   return new TimeseriesCache({
+    bias,
     keys,
     loadPage({ from, to }) {
       const res = [];
@@ -51,11 +55,34 @@ describe('TimeseriesCache', () => {
     expect(cache.size).toBe(2);
   });
 
+  test('works with custom bias', async() => {
+    const cache = getCache({
+      bias: 1000 * 37
+    });
+
+    const from = new Date('0000-01-01T00:00:37Z');
+    const to  = new Date('0000-01-01T00:05:37Z');
+
+    const value = await cache.get(from, to, Slice.Prev);
+    expect(value).toMatchObject({
+      value: expect.any(Number),
+      _page: {
+        id: 1,
+        version: 1
+      },
+      timestamp: new Date(to - THIRTY_SEC)
+    });
+    expect(cache.pageLoads).toBe(2);
+    expect(cache.size).toBe(2);
+  });
+
   test('works with custom keys', async() => {
     const cache = getCache({
-      pageInfo:  'metadata',
-      timestamp: 'time',
-      value:     'data'
+      keys: {
+        pageInfo:  'metadata',
+        timestamp: 'time',
+        value:     'data'
+      }
     });
 
     const from = new Date('0000-01-01T00:00:00Z');

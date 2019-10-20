@@ -2,6 +2,7 @@
 
 // 5 minutes
 const DEFAULT_ALIGNMENT = 1000 * 60 * 5;
+const DEFAULT_BIAS      = 0;
 
 const DEFAULT_KEYS = {
   pageInfo:  '_page',
@@ -16,21 +17,21 @@ const Slice = {
   Next: [[1, 2], [0, 1]]
 };
 
-function pageFrom(alignment, timestamp) {
+function pageFrom(alignment, bias, timestamp) {
   const value = timestamp.valueOf();
-  return new Date(Math.floor(value / alignment) * alignment);
+  return new Date(Math.floor((value - bias) / alignment) * alignment + bias);
 }
 
-function pageTo(alignment, timestamp) {
+function pageTo(alignment, bias, timestamp) {
   const value = timestamp.valueOf();
   // NB: not the same as Math.ceil, because ceil will be equal to floor if value
   //     is on the alignment boundary
-  return new Date(Math.floor(value / alignment) * alignment + alignment);
+  return new Date(Math.floor((value - bias) / alignment) * alignment + alignment + bias);
 }
 
-function getPageRange(alignment, timestamp) {
-  const from = pageFrom(alignment, timestamp);
-  const to   = pageTo(alignment, timestamp);
+function getPageRange(alignment, bias, timestamp) {
+  const from = pageFrom(alignment, bias, timestamp);
+  const to   = pageTo(alignment, bias, timestamp);
   return { from, to };
 }
 
@@ -97,9 +98,10 @@ class TimeseriesCache {
   constructor({
     loadPage,
     alignment = DEFAULT_ALIGNMENT,
+    bias      = DEFAULT_BIAS,
     keys      = DEFAULT_KEYS
   }) {
-    this._getPageRange = getPageRange.bind(null, alignment);
+    this._getPageRange = getPageRange.bind(null, alignment, bias);
     this._keys         = keys;
     this._loadPage     = loadPage;
 
