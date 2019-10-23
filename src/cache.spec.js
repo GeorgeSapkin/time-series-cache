@@ -4,7 +4,7 @@ const { promisify } = require('util');
 
 const _setTimeout = promisify(setTimeout);
 
-const { Slice, TimeseriesCache } = require('./cache');
+const { Slice, TimeSeriesCache } = require('./cache');
 
 const THIRTY_SEC = 1000 * 30;
 
@@ -12,7 +12,7 @@ function getCache({
   bias = undefined,
   keys = undefined
 } = {}) {
-  return new TimeseriesCache({
+  return new TimeSeriesCache({
     bias,
     keys,
     loadPage({ from, to }) {
@@ -33,7 +33,7 @@ function getCache({
   });
 }
 
-describe('TimeseriesCache', () => {
+describe('TimeSeriesCache', () => {
   test('only loads 2 pages with multiple parallel gets', async() => {
     const cache = getCache();
 

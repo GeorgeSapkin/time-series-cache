@@ -96,7 +96,7 @@ class Page {
   }
 }
 
-class TimeseriesCache {
+class TimeSeriesCache {
   constructor({
     loadPage,
     alignment = DEFAULT_ALIGNMENT,
@@ -209,5 +209,5 @@ class TimeseriesCache {
 
 module.exports = {
   Slice,
-  TimeseriesCache
+  TimeSeriesCache
 };
