@@ -1,5 +1,5 @@
 {
-  "name": "timeseries-cache",
+  "name": "time-series-cache",
   "version": "0.1.0",
   "main": "src/cache.js",
   "author": {

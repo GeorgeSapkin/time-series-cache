@@ -26,7 +26,9 @@ function pageTo(alignment, bias, timestamp) {
   const value = timestamp.valueOf();
   // NB: not the same as Math.ceil, because ceil will be equal to floor if value
   //     is on the alignment boundary
-  return new Date(Math.floor((value - bias) / alignment) * alignment + alignment + bias);
+  return new Date(
+    Math.floor((value - bias) / alignment) * alignment + alignment + bias
+  );
 }
 
 function getPageRange(alignment, bias, timestamp) {
@@ -147,7 +149,7 @@ class TimeseriesCache {
       this._getValue(from, to, slice[1], to);
   }
 
-  async isUpToDate(value) {
+  isUpToDate(value) {
     const {
       [this._keys.pageInfo]:  { id, version } = {}
     } = value;
@@ -155,7 +157,7 @@ class TimeseriesCache {
     if (!this._pagesById.has(id))
       return false;
 
-    const page = await this._pagesById.get(id);
+    const page = this._pagesById.get(id);
     return version === page.version;
   }
 

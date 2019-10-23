@@ -1,9 +1,13 @@
-# Timeseries Cache `timeseries-cache`
+# Time Series Cache `time-series-cache`
 
 [![NPM version][npm-image]][npm-url]
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 [![Downloads][downloads-image]][downloads-url]
+
+A spatial, demand cache that stores chronologically-ordered time series data.
+The cache can be updated (upsert) to cache new values after an initial page
+load. Stale data can be evicted based on time.
 
 ## License
 
