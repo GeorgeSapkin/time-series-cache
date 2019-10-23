@@ -4,3 +4,4 @@ node_modules/
 
 .eslintrc
 **/*.spec.js
+.travis.yml
