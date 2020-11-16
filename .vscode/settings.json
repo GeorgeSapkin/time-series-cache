@@ -1,7 +1,9 @@
 {
-  "eslint.autoFixOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
   "cSpell.words": [
     "Timeseries",
     "upsert"
-  ]
+  ],
 }
